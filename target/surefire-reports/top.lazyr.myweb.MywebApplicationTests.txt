@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Test set: top.lazyr.myweb.MywebApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 1.795 s <<< FAILURE! - in top.lazyr.myweb.MywebApplicationTests
+insertDateToDictionary  Time elapsed: 0.4 s  <<< ERROR!
+org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [word]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+	at top.lazyr.myweb.MywebApplicationTests.insertDateToDictionary(MywebApplicationTests.java:74)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement
+	at top.lazyr.myweb.MywebApplicationTests.insertDateToDictionary(MywebApplicationTests.java:74)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'gratitude' for key 'word'
+	at top.lazyr.myweb.MywebApplicationTests.insertDateToDictionary(MywebApplicationTests.java:74)
+
+insertDataToWord  Time elapsed: 0.329 s  <<< ERROR!
+org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [words]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+	at top.lazyr.myweb.MywebApplicationTests.insertDataToWord(MywebApplicationTests.java:58)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement
+	at top.lazyr.myweb.MywebApplicationTests.insertDataToWord(MywebApplicationTests.java:58)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'gratitude altitude aptitude attitude multitude' for key 'words'
+	at top.lazyr.myweb.MywebApplicationTests.insertDataToWord(MywebApplicationTests.java:58)
+

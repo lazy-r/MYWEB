@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: top.lazyr.myweb.dao.DictionaryDaoTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.924 s - in top.lazyr.myweb.dao.DictionaryDaoTest
