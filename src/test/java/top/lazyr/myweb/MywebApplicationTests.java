@@ -1,18 +1,6 @@
 package top.lazyr.myweb;
 
-import com.clsaa.rest.result.Pagination;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import top.lazyr.myweb.dao.DictionaryDao;
-import top.lazyr.myweb.dao.WordDao;
-import top.lazyr.myweb.model.pojo.MyDictionary;
-import top.lazyr.myweb.model.pojo.MyWord;
-import top.lazyr.myweb.model.vo.RelatedWord;
-import top.lazyr.myweb.service.WordService;
-import top.lazyr.myweb.util.FileUtil;
-
-import java.util.*;
 
 @SpringBootTest
 class MywebApplicationTests {

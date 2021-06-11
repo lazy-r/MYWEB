@@ -1,12 +1,10 @@
 package top.lazyr.myweb.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import top.lazyr.myweb.model.pojo.MyDictionary;
+import top.lazyr.myweb.model.po.MyDictionary;
 import top.lazyr.myweb.service.DictionaryService;
 
 import java.util.List;
@@ -19,6 +17,7 @@ public class DictionaryController {
     private DictionaryService dictionaryService;
 
 
+    @ApiOperation(value = "获取最近查看的五个单词",notes = "获取最近查看的五个单词")
     @GetMapping("/latestWords")
     public List<MyDictionary> getLatestWords(){
         List<MyDictionary> latestWords = dictionaryService.getLatestByTime();
@@ -29,7 +28,7 @@ public class DictionaryController {
     }
 
     @GetMapping
-    public MyDictionary getTranslation( @RequestParam(value = "word",required = true)String word){
+    public MyDictionary getTranslation( @ApiParam(name = "word", value = "待获取翻译的单词",required = true) @RequestParam(value = "word",required = true)String word){
         MyDictionary dictionary = dictionaryService.getOneByWord(word);
         dictionaryService.updateTimeAndSearchCount(dictionary.getId());
         return dictionary;

@@ -1,0 +1,1515 @@
+Index: src/main/java/top/lazyr/myweb/dao/WordDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/dao/WordDao.java b/src/main/java/top/lazyr/myweb/repository/WordDao.java
+rename from src/main/java/top/lazyr/myweb/dao/WordDao.java
+rename to src/main/java/top/lazyr/myweb/repository/WordDao.java
+--- a/src/main/java/top/lazyr/myweb/dao/WordDao.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/repository/WordDao.java	(date 1619074981070)
+@@ -1,10 +1,10 @@
+-package top.lazyr.myweb.dao;
++package top.lazyr.myweb.repository;
+ 
+ import org.springframework.data.jpa.repository.JpaRepository;
+ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+ import org.springframework.data.jpa.repository.Modifying;
+ import org.springframework.data.jpa.repository.Query;
+-import top.lazyr.myweb.model.pojo.MyWord;
++import top.lazyr.myweb.model.po.MyWord;
+ 
+ import javax.transaction.Transactional;
+ import java.util.List;
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\">\n    <modelVersion>4.0.0</modelVersion>\n    <parent>\n        <groupId>org.springframework.boot</groupId>\n        <artifactId>spring-boot-starter-parent</artifactId>\n        <version>2.3.4.RELEASE</version>\n        <relativePath/> <!-- lookup parent from repository -->\n    </parent>\n    <groupId>top.lazyr</groupId>\n    <artifactId>myweb</artifactId>\n    <version>0.0.1-SNAPSHOT</version>\n    <name>myweb</name>\n    <description>This is a personal web</description>\n\n    <properties>\n        <java.version>1.8</java.version>\n        <elasticsearch.version>7.9.2</elasticsearch.version>\n    </properties>\n\n    <dependencies>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>com.fasterxml.jackson.core</groupId>\n            <artifactId>jackson-core</artifactId>\n            <version>2.11.0</version>\n        </dependency>\n        <dependency>\n            <groupId>com.fasterxml.jackson.core</groupId>\n            <artifactId>jackson-annotations</artifactId>\n            <version>2.11.2</version>\n        </dependency>\n\n        <dependency>\n            <groupId>com.fasterxml.jackson.core</groupId>\n            <artifactId>jackson-databind</artifactId>\n            <version>2.11.2</version>\n        </dependency>\n\n        <dependency>\n            <groupId>com.alibaba</groupId>\n            <artifactId>fastjson</artifactId>\n            <version>1.2.49</version>\n        </dependency>\n        <!--jsoup依赖-->\n        <dependency>\n            <groupId>org.jsoup</groupId>\n            <artifactId>jsoup</artifactId>\n            <version>1.10.2</version>\n        </dependency>\n        <!--热部署-->\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-devtools</artifactId>\n            <scope>runtime</scope>\n            <optional>true</optional>\n        </dependency>\n        <!--data-->\n        <dependency>\n            <groupId>com.alibaba</groupId>\n            <artifactId>druid</artifactId>\n            <version>1.1.9</version>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-data-jpa</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-jdbc</artifactId>\n        </dependency>\n        <dependency>\n            <groupId>mysql</groupId>\n            <artifactId>mysql-connector-java</artifactId>\n        </dependency>\n\n\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-web</artifactId>\n        </dependency>\n\n\n<!--        <dependency>-->\n<!--            <groupId>org.springframework.boot</groupId>-->\n<!--            <artifactId>spring-boot-configuration-processor</artifactId>-->\n<!--            <optional>true</optional>-->\n<!--        </dependency>-->\n        <dependency>\n            <groupId>org.projectlombok</groupId>\n            <artifactId>lombok</artifactId>\n            <optional>true</optional>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework.boot</groupId>\n            <artifactId>spring-boot-starter-test</artifactId>\n            <scope>test</scope>\n            <exclusions>\n                <exclusion>\n                    <groupId>org.junit.vintage</groupId>\n                    <artifactId>junit-vintage-engine</artifactId>\n                </exclusion>\n            </exclusions>\n        </dependency>\n        <dependency>\n            <groupId>junit</groupId>\n            <artifactId>junit</artifactId>\n            <scope>test</scope>\n        </dependency>\n        <!--result-->\n        <dependency>\n            <groupId>com.clsaa.rest.result</groupId>\n            <artifactId>standard-result</artifactId>\n            <version>0.0.1</version>\n        </dependency>\n    </dependencies>\n\n    <build>\n        <plugins>\n            <plugin>\n                <groupId>org.springframework.boot</groupId>\n                <artifactId>spring-boot-maven-plugin</artifactId>\n            </plugin>\n        </plugins>\n    </build>\n\n</project>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/pom.xml	(date 1619518608298)
+@@ -20,10 +20,14 @@
+     </properties>
+ 
+     <dependencies>
++        <!--   elasticsearch start  -->
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+         </dependency>
++        <!--   elasticsearch end  -->
++
++        <!--Json start-->
+         <dependency>
+             <groupId>com.fasterxml.jackson.core</groupId>
+             <artifactId>jackson-core</artifactId>
+@@ -34,32 +38,38 @@
+             <artifactId>jackson-annotations</artifactId>
+             <version>2.11.2</version>
+         </dependency>
+-
+         <dependency>
+             <groupId>com.fasterxml.jackson.core</groupId>
+             <artifactId>jackson-databind</artifactId>
+             <version>2.11.2</version>
+         </dependency>
+-
+         <dependency>
+             <groupId>com.alibaba</groupId>
+             <artifactId>fastjson</artifactId>
+             <version>1.2.49</version>
+         </dependency>
+-        <!--jsoup依赖-->
++        <!--Json end-->
++
++
++        <!--爬虫 start-->
+         <dependency>
+             <groupId>org.jsoup</groupId>
+             <artifactId>jsoup</artifactId>
+             <version>1.10.2</version>
+         </dependency>
+-        <!--热部署-->
++        <!--爬虫 start-->
++
++
++        <!--热部署 start-->
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-devtools</artifactId>
+             <scope>runtime</scope>
+             <optional>true</optional>
+         </dependency>
+-        <!--data-->
++        <!--热部署 end-->
++
++        <!--MySQL数据库 start-->
+         <dependency>
+             <groupId>com.alibaba</groupId>
+             <artifactId>druid</artifactId>
+@@ -77,7 +87,7 @@
+             <groupId>mysql</groupId>
+             <artifactId>mysql-connector-java</artifactId>
+         </dependency>
+-
++        <!--MySQL数据库 end-->
+ 
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+@@ -90,11 +100,15 @@
+ <!--            <artifactId>spring-boot-configuration-processor</artifactId>-->
+ <!--            <optional>true</optional>-->
+ <!--        </dependency>-->
++        <!--lombok start-->
+         <dependency>
+             <groupId>org.projectlombok</groupId>
+             <artifactId>lombok</artifactId>
+             <optional>true</optional>
+         </dependency>
++        <!--lombok end-->
++
++        <!--test start-->
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+@@ -111,15 +125,47 @@
+             <artifactId>junit</artifactId>
+             <scope>test</scope>
+         </dependency>
+-        <!--result-->
++        <!--test end-->
++
++
++        <!--result start-->
+         <dependency>
+             <groupId>com.clsaa.rest.result</groupId>
+             <artifactId>standard-result</artifactId>
+             <version>0.0.1</version>
+         </dependency>
++        <!--result end-->
++
++
++        <!--swagger for webflux start-->
++        <dependency>
++            <groupId>io.springfox</groupId>
++            <artifactId>springfox-swagger2</artifactId>
++            <version>2.9.2</version>
++        </dependency>
++<!--        <dependency>-->
++<!--            <groupId>io.springfox</groupId>-->
++<!--            <artifactId>springfox-spring-webflux</artifactId>-->
++<!--            <version>2.9.2</version>-->
++<!--        </dependency>-->
++        <dependency>
++            <groupId>io.springfox</groupId>
++            <artifactId>springfox-swagger-ui</artifactId>
++            <version>2.9.2</version>
++        </dependency>
++        <!--swagger for webflux end-->
++
++
+     </dependencies>
+ 
+     <build>
++        <resources>
++            <!--      使得application.yml文件可以使用pom.xml文件中的变量值      -->
++            <resource>
++                <directory>src/main/resources</directory>
++                <filtering>true</filtering>
++            </resource>
++        </resources>
+         <plugins>
+             <plugin>
+                 <groupId>org.springframework.boot</groupId>
+Index: src/main/java/top/lazyr/myweb/dao/ElasticSearchDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/dao/ElasticSearchDao.java b/src/main/java/top/lazyr/myweb/repository/ElasticSearchDao.java
+rename from src/main/java/top/lazyr/myweb/dao/ElasticSearchDao.java
+rename to src/main/java/top/lazyr/myweb/repository/ElasticSearchDao.java
+--- a/src/main/java/top/lazyr/myweb/dao/ElasticSearchDao.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/repository/ElasticSearchDao.java	(date 1619074981066)
+@@ -1,4 +1,4 @@
+-package top.lazyr.myweb.dao;
++package top.lazyr.myweb.repository;
+ 
+ public interface ElasticSearchDao {
+ }
+Index: src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nspring:\n  datasource:\n    type: com.alibaba.druid.pool.DruidDataSource\n    url: jdbc:mysql://localhost:3306/myweb?useUnicode=true&&characterEncoding=UTF-8&&serverTimezone=UTC\n    username: root\n    password: 135792468\n    driver-class-name: com.mysql.cj.jdbc.Driver\n    max-active: 10\n    max-idle: 5\n    min-idle: 5\n    initial-size: 5\n    max-wait: 10000\n    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒\n    timeBetweenEvictionRunsMillis: 60000\n    # 配置一个连接在池中最小生存的时间，单位是毫秒\n    minEvictableIdleTimeMillis: 30000\n    validationQuery: select 'x'\n    testWhileIdle: true\n    testOnBorrow: false\n    testOnReturn: false\n    # 打开PSCache，并且指定每个连接上PSCache的大小\n    poolPreparedStatements: true\n    maxPoolPreparedStatementPerConnectionSize: 20\n    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙\n    filters: stat,wall,log4j\n    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录\n    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000\n    # 合并多个DruidDataSource的监控数据\n    useGlobalDataSourceStat: true\n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\nserver:\n  port: 8040\n\n\nspring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS: true\nspring.jackson.serialization.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/application.yml b/src/main/resources/application.yml
+--- a/src/main/resources/application.yml	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/resources/application.yml	(date 1619517544923)
+@@ -1,10 +1,12 @@
++server:
++  port: 8040
+ 
+ spring:
+   datasource:
+     type: com.alibaba.druid.pool.DruidDataSource
+     url: jdbc:mysql://localhost:3306/myweb?useUnicode=true&&characterEncoding=UTF-8&&serverTimezone=UTC
+     username: root
+-    password: 135792468
++    password: wjr9422325vm
+     driver-class-name: com.mysql.cj.jdbc.Driver
+     max-active: 10
+     max-idle: 5
+@@ -32,9 +34,18 @@
+     hibernate:
+       ddl-auto: update
+     show-sql: true
+-server:
+-  port: 8040
+-
++  application:
++    name: MYWEB
+ 
+ spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS: true
+ spring.jackson.serialization.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
++
++project:
++  show: true
++  host: localhost:${server.port}
++  groupId: @project.groupId@
++  artifactId: @project.artifactId@
++  version: @project.version@
++  name: @project.name@
++  description: @project.description@
++  url: @project.url@
+Index: src/main/java/top/lazyr/myweb/controller/DictionaryController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb.controller;\n\nimport com.alibaba.fastjson.JSON;\nimport com.fasterxml.jackson.core.JsonProcessingException;\nimport com.fasterxml.jackson.databind.ObjectMapper;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Controller;\nimport org.springframework.web.bind.annotation.*;\nimport top.lazyr.myweb.model.pojo.MyDictionary;\nimport top.lazyr.myweb.service.DictionaryService;\n\nimport java.util.List;\n\n@CrossOrigin\n@RestController\n@RequestMapping(\"/dic/t\")\npublic class DictionaryController {\n    @Autowired\n    private DictionaryService dictionaryService;\n\n\n    @GetMapping(\"/latestWords\")\n    public List<MyDictionary> getLatestWords(){\n        List<MyDictionary> latestWords = dictionaryService.getLatestByTime();\n        for (MyDictionary latestWord : latestWords) {\n            System.out.println(latestWord.getTranslation()+\"\\n\");\n        }\n        return latestWords;\n    }\n\n    @GetMapping\n    public MyDictionary getTranslation( @RequestParam(value = \"word\",required = true)String word){\n        MyDictionary dictionary = dictionaryService.getOneByWord(word);\n        dictionaryService.updateTimeAndSearchCount(dictionary.getId());\n        return dictionary;\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/controller/DictionaryController.java b/src/main/java/top/lazyr/myweb/controller/DictionaryController.java
+--- a/src/main/java/top/lazyr/myweb/controller/DictionaryController.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/controller/DictionaryController.java	(date 1616382151429)
+@@ -1,12 +1,10 @@
+ package top.lazyr.myweb.controller;
+ 
+-import com.alibaba.fastjson.JSON;
+-import com.fasterxml.jackson.core.JsonProcessingException;
+-import com.fasterxml.jackson.databind.ObjectMapper;
++import io.swagger.annotations.ApiOperation;
++import io.swagger.annotations.ApiParam;
+ import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.*;
+-import top.lazyr.myweb.model.pojo.MyDictionary;
++import top.lazyr.myweb.model.po.MyDictionary;
+ import top.lazyr.myweb.service.DictionaryService;
+ 
+ import java.util.List;
+@@ -19,6 +17,7 @@
+     private DictionaryService dictionaryService;
+ 
+ 
++    @ApiOperation(value = "获取最近查看的五个单词",notes = "获取最近查看的五个单词")
+     @GetMapping("/latestWords")
+     public List<MyDictionary> getLatestWords(){
+         List<MyDictionary> latestWords = dictionaryService.getLatestByTime();
+@@ -29,7 +28,7 @@
+     }
+ 
+     @GetMapping
+-    public MyDictionary getTranslation( @RequestParam(value = "word",required = true)String word){
++    public MyDictionary getTranslation( @ApiParam(name = "word", value = "待获取翻译的单词",required = true) @RequestParam(value = "word",required = true)String word){
+         MyDictionary dictionary = dictionaryService.getOneByWord(word);
+         dictionaryService.updateTimeAndSearchCount(dictionary.getId());
+         return dictionary;
+Index: src/main/java/top/lazyr/myweb/service/impl/WordServiceImpl.java
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/service/impl/WordServiceImpl.java b/src/main/java/top/lazyr/myweb/service/impl/WordServiceImpl.java
+deleted file mode 100644
+--- a/src/main/java/top/lazyr/myweb/service/impl/WordServiceImpl.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ /dev/null	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
+@@ -1,92 +0,0 @@
+-package top.lazyr.myweb.service.impl;
+-
+-import com.clsaa.rest.result.Pagination;
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.data.domain.Page;
+-import org.springframework.data.domain.PageRequest;
+-import org.springframework.data.domain.Pageable;
+-import org.springframework.data.domain.Sort;
+-import org.springframework.data.jpa.domain.Specification;
+-import org.springframework.stereotype.Service;
+-import top.lazyr.myweb.dao.DictionaryDao;
+-import top.lazyr.myweb.dao.WordDao;
+-import top.lazyr.myweb.model.pojo.MyWord;
+-import top.lazyr.myweb.model.vo.RelatedWord;
+-import top.lazyr.myweb.service.WordService;
+-import top.lazyr.myweb.util.JavaBeanUtil;
+-
+-import javax.persistence.criteria.*;
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-@Service
+-public class WordServiceImpl implements WordService {
+-    @Autowired
+-    private WordDao dao;
+-
+-    @Override
+-    public MyWord getOneById(long id) {
+-        return dao.getOne(id);
+-    }
+-
+-    @Override
+-    public int getSearchCountById(long id) {
+-        MyWord myWord = dao.getOne(id);
+-        return myWord == null?null:myWord.getSearchCount();
+-    }
+-
+-    @Override
+-    public String getWordsById(long id) {
+-        MyWord myWord = dao.getOne(id);
+-        return myWord == null?null:myWord.getWords();
+-    }
+-
+-    @Override
+-    public MyWord getOneByWords(String word) {
+-        return dao.getOneByWords(word);
+-    }
+-
+-    @Override
+-    public Pagination<RelatedWord> getAllByWord(Integer pageNo, Integer pageSize,String word) {
+-        Specification<MyWord> specification = new Specification<MyWord>() {
+-
+-            @Override
+-            public Predicate toPredicate(Root<MyWord> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+-                Path words = root.get("words");
+-                Predicate predicate = criteriaBuilder.like(words, "%" + word + "%");
+-                return predicate;
+-            }
+-        };
+-
+-        Sort sort = Sort.by(Sort.Direction.DESC, "searchCount");
+-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
+-        Page<MyWord> allWords = dao.findAll(specification, pageable);
+-        List<RelatedWord> relatedWords = JavaBeanUtil.myWords2RelatedWords(allWords.getContent(),word);
+-        Pagination<RelatedWord> pagination = new Pagination<>();
+-        pagination.setPageNo(pageNo);
+-        pagination.setPageSize(pageSize);
+-        pagination.setPageList(relatedWords);
+-        pagination.setTotalCount(dao.getAllByWords("%"+word+"%").size());
+-        return pagination;
+-    }
+-
+-    @Override
+-    public int updateSearchCountById(long id) {
+-        return dao.updateSearchCountById(id);
+-    }
+-
+-    @Override
+-    public int insertOne(String words) {
+-        return insertOne(MyWord.builder().words(words).build());
+-    }
+-
+-    @Override
+-    public int insertOne(MyWord myWord) {
+-        return dao.save(myWord) == null?null:1;
+-    }
+-
+-    @Override
+-    public int insertAll(List<MyWord> myWords) {
+-        return dao.saveAll(myWords)==null?null:myWords.size();
+-    }
+-}
+Index: src/main/java/top/lazyr/myweb/service/ElasticSearchService.java
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/service/ElasticSearchService.java b/src/main/java/top/lazyr/myweb/service/ElasticSearchService.java
+deleted file mode 100644
+--- a/src/main/java/top/lazyr/myweb/service/ElasticSearchService.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ /dev/null	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
+@@ -1,4 +0,0 @@
+-package top.lazyr.myweb.service;
+-
+-public interface ElasticSearchService {
+-}
+Index: src/main/java/top/lazyr/myweb/service/impl/DictionaryServiceImpl.java
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/service/impl/DictionaryServiceImpl.java b/src/main/java/top/lazyr/myweb/service/impl/DictionaryServiceImpl.java
+deleted file mode 100644
+--- a/src/main/java/top/lazyr/myweb/service/impl/DictionaryServiceImpl.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ /dev/null	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
+@@ -1,90 +0,0 @@
+-package top.lazyr.myweb.service.impl;
+-
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.stereotype.Service;
+-import top.lazyr.myweb.dao.DictionaryDao;
+-import top.lazyr.myweb.model.pojo.MyDictionary;
+-import top.lazyr.myweb.model.pojo.MyWord;
+-import top.lazyr.myweb.service.DictionaryService;
+-import top.lazyr.myweb.util.HttpParseUtil;
+-
+-import java.util.List;
+-
+-@Service
+-public class DictionaryServiceImpl implements DictionaryService {
+-    @Autowired
+-    private DictionaryDao dao;
+-
+-    @Override
+-    public String getTranslationById(Long id) {
+-        MyDictionary dictionary = dao.getOne(id);
+-        return dictionary == null?null:dictionary.getTranslation();
+-    }
+-
+-    @Override
+-    public int getSearchCountById(Long id) {
+-        MyDictionary dictionary = dao.getOne(id);
+-        return dictionary == null?null:dictionary.getSearchCount();
+-    }
+-
+-    @Override
+-    public MyDictionary getOneById(Long id) {
+-        return dao.getOne(id);
+-    }
+-
+-    @Override
+-    public String getTranslationByWord(String word) {
+-        MyDictionary dictionary = dao.getOneByWord(word);
+-        return dictionary == null?null:dictionary.getTranslation();
+-    }
+-
+-    @Override
+-    public int getSearchCountByWord(String word) {
+-        MyDictionary dictionary = dao.getOneByWord(word);
+-        return dictionary == null?null:dictionary.getSearchCount();
+-    }
+-
+-    @Override
+-    public MyDictionary getOneByWord(String word) {
+-        MyDictionary one = dao.getOneByWord(word);
+-        if(one == null){
+-            System.out.println("单词："+word+"未找到，将自动补充到字典里");
+-            String translation = HttpParseUtil.translateWord(word);
+-            one = MyDictionary.builder().word(word).translation(translation).build();
+-            dao.save(one);
+-        }
+-        return one;
+-    }
+-
+-    @Override
+-    public List<MyDictionary> getAllByWord(String word) {
+-        return dao.getAllByWord("%"+word+"%");
+-    }
+-
+-    @Override
+-    public List<MyDictionary> getLatestByTime() {
+-        return dao.getLatestByTime();
+-    }
+-
+-    @Override
+-    public int updateTimeAndSearchCount(Long id) {
+-        return dao.updateTimeAndSearchCount(id);
+-    }
+-
+-    @Override
+-    public int insertOne(MyDictionary dictionary) {
+-        return dao.save(dictionary) == null?null:1;
+-    }
+-
+-    @Override
+-    public int insertOne(String word, String translation) {
+-        return insertOne(MyDictionary.builder().word(word).translation(translation).build());
+-    }
+-
+-    @Override
+-    public int insertAll(List<MyDictionary> dictionaries) {
+-        return dao.saveAll(dictionaries) == null?null:dictionaries.size();
+-    }
+-
+-
+-}
+Index: src/test/java/top/lazyr/myweb/MywebApplicationTests.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb;\n\nimport com.clsaa.rest.result.Pagination;\nimport org.junit.jupiter.api.Test;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.boot.test.context.SpringBootTest;\nimport top.lazyr.myweb.dao.DictionaryDao;\nimport top.lazyr.myweb.dao.WordDao;\nimport top.lazyr.myweb.model.pojo.MyDictionary;\nimport top.lazyr.myweb.model.pojo.MyWord;\nimport top.lazyr.myweb.model.vo.RelatedWord;\nimport top.lazyr.myweb.service.WordService;\nimport top.lazyr.myweb.util.FileUtil;\n\nimport java.util.*;\n\n@SpringBootTest\nclass MywebApplicationTests {\n//    @Autowired\n//    private WordDao dao;\n//    @Autowired\n//    private DictionaryDao dictionaryDao;\n//    @Autowired\n//    private WordService service;\n//\n//    @Test\n//    void testWordService(){\n//        Pagination<RelatedWord> can = service.getAllByWord(1, 8, \"can\");\n//        System.out.println(can.getPageList().toString());\n//    }\n//\n//    @Test\n//    void testWordDao() {\n//        int i = dao.updateSearchCountById(1l);\n//        System.out.println(dao.getOne(1l));\n//\n//    }\n//\n//    @Test\n//    void testDictionaryDao(){\n//        List<MyDictionary> latestByTime = dictionaryDao.getLatestByTime();\n//        for (MyDictionary myDictionary : latestByTime) {\n//            System.out.println(myDictionary);\n//        }\n//    }\n//    @Test\n//    public void insertDataToWord() {\n//        String fileByLine = FileUtil.readFileByLine(\"C:\\\\Users\\\\Lazy r\\\\Desktop\\\\myweb\\\\word.txt\");\n//        String[] allWords = fileByLine.split(\"\\n\");\n//        List<MyWord> list = new ArrayList<>();\n//        Map<String,String> map = new HashMap<>();\n//        for (String words : allWords) {\n//            if(!map.containsKey(words.trim())){\n//                list.add(MyWord.builder().words(words.trim()).build());\n//                map.put(words.trim(),\"\");\n//            }\n//        }\n//        dao.saveAll(list);\n//    }\n//\n//    @Test\n//    public void insertDateToDictionary(){\n//        String fileByLine = FileUtil.readFileByLine(\"C:\\\\Users\\\\Lazy r\\\\Desktop\\\\myweb\\\\mydic.txt\");\n//        String[] allWords = fileByLine.split(\"\\n\\n\");\n//        List<MyDictionary> list = new ArrayList<>();\n//        Map<String,String> map = new HashMap<>();\n//        for (String words : allWords) {\n//            String[] dic = words.split(\":\");\n//            if(dic.length>1 && !map.containsKey(dic[0].trim())){\n//                list.add(MyDictionary.builder().word(dic[0]).translation(dic[1].trim().replaceAll(\"\\n\",\"<br/>\")).build());\n//                map.put(dic[0].trim(),\"\");\n//            }\n//        }\n//        dictionaryDao.saveAll(list);\n//    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/top/lazyr/myweb/MywebApplicationTests.java b/src/test/java/top/lazyr/myweb/MywebApplicationTests.java
+--- a/src/test/java/top/lazyr/myweb/MywebApplicationTests.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/test/java/top/lazyr/myweb/MywebApplicationTests.java	(date 1615512569981)
+@@ -1,18 +1,6 @@
+ package top.lazyr.myweb;
+ 
+-import com.clsaa.rest.result.Pagination;
+-import org.junit.jupiter.api.Test;
+-import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.boot.test.context.SpringBootTest;
+-import top.lazyr.myweb.dao.DictionaryDao;
+-import top.lazyr.myweb.dao.WordDao;
+-import top.lazyr.myweb.model.pojo.MyDictionary;
+-import top.lazyr.myweb.model.pojo.MyWord;
+-import top.lazyr.myweb.model.vo.RelatedWord;
+-import top.lazyr.myweb.service.WordService;
+-import top.lazyr.myweb.util.FileUtil;
+-
+-import java.util.*;
+ 
+ @SpringBootTest
+ class MywebApplicationTests {
+Index: target/classes/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nspring:\n  datasource:\n    type: com.alibaba.druid.pool.DruidDataSource\n    url: jdbc:mysql://localhost:3306/myweb?useUnicode=true&&characterEncoding=UTF-8&&serverTimezone=UTC\n    username: root\n    password: 135792468\n    driver-class-name: com.mysql.cj.jdbc.Driver\n    max-active: 10\n    max-idle: 5\n    min-idle: 5\n    initial-size: 5\n    max-wait: 10000\n    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒\n    timeBetweenEvictionRunsMillis: 60000\n    # 配置一个连接在池中最小生存的时间，单位是毫秒\n    minEvictableIdleTimeMillis: 30000\n    validationQuery: select 'x'\n    testWhileIdle: true\n    testOnBorrow: false\n    testOnReturn: false\n    # 打开PSCache，并且指定每个连接上PSCache的大小\n    poolPreparedStatements: true\n    maxPoolPreparedStatementPerConnectionSize: 20\n    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙\n    filters: stat,wall,log4j\n    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录\n    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000\n    # 合并多个DruidDataSource的监控数据\n    useGlobalDataSourceStat: true\n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\nserver:\n  port: 8040\n\n\nspring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS: true\nspring.jackson.serialization.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/target/classes/application.yml b/target/classes/application.yml
+--- a/target/classes/application.yml	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/target/classes/application.yml	(date 1619517778385)
+@@ -1,10 +1,12 @@
++server:
++  port: 8040
+ 
+ spring:
+   datasource:
+     type: com.alibaba.druid.pool.DruidDataSource
+     url: jdbc:mysql://localhost:3306/myweb?useUnicode=true&&characterEncoding=UTF-8&&serverTimezone=UTC
+     username: root
+-    password: 135792468
++    password: wjr9422325vm
+     driver-class-name: com.mysql.cj.jdbc.Driver
+     max-active: 10
+     max-idle: 5
+@@ -32,9 +34,18 @@
+     hibernate:
+       ddl-auto: update
+     show-sql: true
+-server:
+-  port: 8040
+-
++  application:
++    name: MYWEB
+ 
+ spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS: true
+ spring.jackson.serialization.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
++
++project:
++  show: true
++  host: localhost:${server.port}
++  groupId: top.lazyr
++  artifactId: myweb
++  version: 0.0.1-SNAPSHOT
++  name: myweb
++  description: This is a personal web
++  url: https://spring.io/projects/spring-boot/myweb
+Index: src/main/java/top/lazyr/myweb/dao/DictionaryDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/dao/DictionaryDao.java b/src/main/java/top/lazyr/myweb/repository/DictionaryDao.java
+rename from src/main/java/top/lazyr/myweb/dao/DictionaryDao.java
+rename to src/main/java/top/lazyr/myweb/repository/DictionaryDao.java
+--- a/src/main/java/top/lazyr/myweb/dao/DictionaryDao.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/repository/DictionaryDao.java	(date 1619074981074)
+@@ -1,10 +1,10 @@
+-package top.lazyr.myweb.dao;
++package top.lazyr.myweb.repository;
+ 
+ import org.springframework.data.jpa.repository.JpaRepository;
+ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+ import org.springframework.data.jpa.repository.Modifying;
+ import org.springframework.data.jpa.repository.Query;
+-import top.lazyr.myweb.model.pojo.MyDictionary;
++import top.lazyr.myweb.model.po.MyDictionary;
+ 
+ import javax.transaction.Transactional;
+ import java.util.List;
+Index: .idea/dataSources.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/dataSources.xml b/.idea/dataSources.xml
+new file mode 100644
+--- /dev/null	(date 1616382224322)
++++ b/.idea/dataSources.xml	(date 1616382224322)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
++    <data-source source="LOCAL" name="jdbc:mysql://localhost:3306/myweb?useUnicode=true&amp;&amp;characterEncoding=UTF-8&amp;&amp;serverTimezone=UTC" uuid="1bbe6cfc-3ccc-4f58-b557-ce2a08ece37b">
++      <driver-ref>mysql.8</driver-ref>
++      <synchronize>true</synchronize>
++      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
++      <jdbc-url>jdbc:mysql://localhost:3306/myweb?useUnicode=true&amp;&amp;characterEncoding=UTF-8&amp;&amp;serverTimezone=UTC</jdbc-url>
++      <working-dir>$ProjectFileDir$</working-dir>
++    </data-source>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/main/java/top/lazyr/myweb/service/DictionaryService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb.service;\n\n\nimport top.lazyr.myweb.model.pojo.MyDictionary;\nimport top.lazyr.myweb.model.pojo.MyWord;\n\nimport java.util.List;\n\npublic interface DictionaryService {\n\n    String getTranslationById(Long id);\n    int getSearchCountById(Long id);\n    MyDictionary getOneById(Long id);\n\n    String getTranslationByWord(String word);\n    int getSearchCountByWord(String word);\n    MyDictionary getOneByWord(String word);\n    List<MyDictionary> getAllByWord(String word);\n\n    List<MyDictionary> getLatestByTime();\n\n    int updateTimeAndSearchCount(Long id);\n\n    int insertOne(MyDictionary dictionary);\n\n    int insertOne(String word,String translation);\n\n    int insertAll(List<MyDictionary> dictionaries);\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/service/DictionaryService.java b/src/main/java/top/lazyr/myweb/service/DictionaryService.java
+--- a/src/main/java/top/lazyr/myweb/service/DictionaryService.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/service/DictionaryService.java	(date 1619074981069)
+@@ -1,30 +1,77 @@
+ package top.lazyr.myweb.service;
+ 
+-
+-import top.lazyr.myweb.model.pojo.MyDictionary;
+-import top.lazyr.myweb.model.pojo.MyWord;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Service;
++import top.lazyr.myweb.repository.DictionaryDao;
++import top.lazyr.myweb.model.po.MyDictionary;
++import top.lazyr.myweb.util.HttpParseUtil;
+ 
+ import java.util.List;
+ 
+-public interface DictionaryService {
++@Service
++public class DictionaryService {
++    @Autowired
++    private DictionaryDao dao;
++
++    public String getTranslationById(Long id) {
++        MyDictionary dictionary = dao.getOne(id);
++        return dictionary == null?null:dictionary.getTranslation();
++    }
++
++    public int getSearchCountById(Long id) {
++        MyDictionary dictionary = dao.getOne(id);
++        return dictionary == null?null:dictionary.getSearchCount();
++    }
++
++    public MyDictionary getOneById(Long id) {
++        return dao.getOne(id);
++    }
+ 
+-    String getTranslationById(Long id);
+-    int getSearchCountById(Long id);
+-    MyDictionary getOneById(Long id);
++    public String getTranslationByWord(String word) {
++        MyDictionary dictionary = dao.getOneByWord(word);
++        return dictionary == null?null:dictionary.getTranslation();
++    }
+ 
+-    String getTranslationByWord(String word);
+-    int getSearchCountByWord(String word);
+-    MyDictionary getOneByWord(String word);
+-    List<MyDictionary> getAllByWord(String word);
++    public int getSearchCountByWord(String word) {
++        MyDictionary dictionary = dao.getOneByWord(word);
++        return dictionary == null?null:dictionary.getSearchCount();
++    }
+ 
+-    List<MyDictionary> getLatestByTime();
++    public MyDictionary getOneByWord(String word) {
++        MyDictionary one = dao.getOneByWord(word);
++        if(one == null){
++            System.out.println("单词："+word+"未找到，将自动补充到字典里");
++            String translation = HttpParseUtil.translateWord(word);
++            one = MyDictionary.builder().word(word).translation(translation).build();
++            dao.save(one);
++        }
++        return one;
++    }
+ 
+-    int updateTimeAndSearchCount(Long id);
++    public List<MyDictionary> getAllByWord(String word) {
++        return dao.getAllByWord("%"+word+"%");
++    }
+ 
+-    int insertOne(MyDictionary dictionary);
++    public List<MyDictionary> getLatestByTime() {
++        return dao.getLatestByTime();
++    }
+ 
+-    int insertOne(String word,String translation);
++    public int updateTimeAndSearchCount(Long id) {
++        return dao.updateTimeAndSearchCount(id);
++    }
+ 
+-    int insertAll(List<MyDictionary> dictionaries);
++    public int insertOne(MyDictionary dictionary) {
++        return dao.save(dictionary) == null?null:1;
++    }
++
++    public int insertOne(String word, String translation) {
++        return insertOne(MyDictionary.builder().word(word).translation(translation).build());
++    }
++
++    public int insertAll(List<MyDictionary> dictionaries) {
++        return dao.saveAll(dictionaries) == null?null:dictionaries.size();
++    }
++
++
+ 
+ }
+Index: .idea/encodings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"Encoding\" native2AsciiForPropertiesFiles=\"true\" defaultCharsetForPropertiesFiles=\"UTF-8\">\n    <file url=\"file://$PROJECT_DIR$\" charset=\"UTF-8\" />\n    <file url=\"PROJECT\" charset=\"UTF-8\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/encodings.xml b/.idea/encodings.xml
+--- a/.idea/encodings.xml	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/.idea/encodings.xml	(date 1614677654106)
+@@ -2,6 +2,7 @@
+ <project version="4">
+   <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
++    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+     <file url="PROJECT" charset="UTF-8" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/jarRepositories.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/jarRepositories.xml b/.idea/jarRepositories.xml
+new file mode 100644
+--- /dev/null	(date 1614677654108)
++++ b/.idea/jarRepositories.xml	(date 1614677654108)
+@@ -0,0 +1,20 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="RemoteRepositoriesConfiguration">
++    <remote-repository>
++      <option name="id" value="central" />
++      <option name="name" value="Central Repository" />
++      <option name="url" value="https://repo.maven.apache.org/maven2" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="central" />
++      <option name="name" value="Maven Central repository" />
++      <option name="url" value="https://repo1.maven.org/maven2" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="jboss.community" />
++      <option name="name" value="JBoss Community repository" />
++      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
++    </remote-repository>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/main/java/top/lazyr/myweb/util/Validator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/Validator.java b/src/main/java/top/lazyr/myweb/util/Validator.java
+new file mode 100644
+--- /dev/null	(date 1616381162477)
++++ b/src/main/java/top/lazyr/myweb/util/Validator.java	(date 1616381162477)
+@@ -0,0 +1,10 @@
++package top.lazyr.myweb.util;
++
++/**
++ * 校验器
++ *
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class Validator {
++}
+Index: src/main/java/top/lazyr/myweb/util/TimeUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/TimeUtil.java b/src/main/java/top/lazyr/myweb/util/TimeUtil.java
+new file mode 100644
+--- /dev/null	(date 1616381752129)
++++ b/src/main/java/top/lazyr/myweb/util/TimeUtil.java	(date 1616381752129)
+@@ -0,0 +1,9 @@
++package top.lazyr.myweb.util;
++
++/**
++ * 时间相关的工具方法
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class TimeUtil {
++}
+Index: src/main/java/top/lazyr/myweb/util/BeanUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/BeanUtil.java b/src/main/java/top/lazyr/myweb/util/BeanUtil.java
+new file mode 100644
+--- /dev/null	(date 1619512495507)
++++ b/src/main/java/top/lazyr/myweb/util/BeanUtil.java	(date 1619512495507)
+@@ -0,0 +1,27 @@
++package top.lazyr.myweb.util;
++
++/**
++ * 处理Bean类型转寒
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class BeanUtil {
++    /**
++     * 类型转换
++     */
++    public static <T, R> R convertType(T source, Class<R> targetClass) {
++        if (source == null || targetClass == null) {
++            return null;
++        }
++
++        final R result;
++        try {
++            result = targetClass.newInstance();
++        } catch (Exception e) {
++            e.printStackTrace();
++            return null;
++        }
++        org.springframework.beans.BeanUtils.copyProperties(source, result);
++        return result;
++    }
++}
+Index: src/main/java/top/lazyr/myweb/config/SwaggerConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/config/SwaggerConfig.java b/src/main/java/top/lazyr/myweb/config/SwaggerConfig.java
+new file mode 100644
+--- /dev/null	(date 1619520809146)
++++ b/src/main/java/top/lazyr/myweb/config/SwaggerConfig.java	(date 1619520809146)
+@@ -0,0 +1,60 @@
++package top.lazyr.myweb.config;
++
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.boot.context.properties.ConfigurationProperties;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import springfox.documentation.builders.ApiInfoBuilder;
++import springfox.documentation.builders.PathSelectors;
++import springfox.documentation.builders.RequestHandlerSelectors;
++import springfox.documentation.service.ApiInfo;
++import springfox.documentation.service.Contact;
++import springfox.documentation.spi.DocumentationType;
++import springfox.documentation.spring.web.plugins.Docket;
++import springfox.documentation.swagger2.annotations.EnableSwagger2;
++
++import java.util.ArrayList;
++
++/**
++ * Swagger配置类
++ * @author lazyr
++ * @created 2021/4/27
++ */
++@Configuration
++@EnableSwagger2
++//@ConfigurationProperties(prefix = "project")
++public class SwaggerConfig {
++//    private static final String API_PACKAGE_NAME = SwaggerConfig.class.getPackage().getName().replace("config", "controller");
++//    private boolean show;
++//    private String host;
++//    private String groupId;
++//    private String artifactId;
++//    private String version;
++//    private String name;
++//    private String description;
++//    private String url;
++
++
++
++
++//    //配置Swagger的Docket的bean实例
++//    @Bean
++//    public Docket docket(){
++//        return new Docket(DocumentationType.SWAGGER_2)
++//                .apiInfo(getApiInfo());
++//    }
++//
++//    //配置Swagger信息=apiInfo
++//    private ApiInfo getApiInfo(){
++//        Contact contact = new Contact("wjr", "http://119.23.231.254:8080", "2296339656@qq.com");
++//        return new ApiInfo("LAZYR Api Documentation",
++//                "LAZRY IS THE BEST",
++//                "1.0",
++//                "http://119.23.231.254:8080/dictionary/",
++//                contact,
++//                "Apache 2.0",
++//                "http://www.apache.org/licenses/LICENSE-2.0",
++//                new ArrayList());
++//    }
++
++}
+Index: src/main/java/top/lazyr/myweb/util/JavaBeanUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb.util;\n\nimport top.lazyr.myweb.model.pojo.MyWord;\nimport top.lazyr.myweb.model.vo.RelatedWord;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class JavaBeanUtil {\n    public static RelatedWord myWord2RelatedWord(MyWord myWord){\n        return RelatedWord.builder()\n                .id(myWord.getId())\n                .searchCount(myWord.getSearchCount())\n                .words(myWord.getWords().split(\" \"))\n                .highlightWords(myWord.getWords().split(\" \")).build();\n    }\n\n    public static List<RelatedWord> myWords2RelatedWords(List<MyWord> myWords){\n        List<RelatedWord> relatedWords = new ArrayList<>();\n        myWords.forEach(item->{\n            relatedWords.add(myWord2RelatedWord(item));\n        });\n        return relatedWords;\n    }\n\n\n    public static List<RelatedWord> myWords2RelatedWords(List<MyWord> myWords,String word){\n        List<RelatedWord> relatedWords = new ArrayList<>();\n        myWords.forEach(item->{\n            relatedWords.add(myWord2RelatedWord(item,word));\n        });\n        return relatedWords;\n    }\n    public static RelatedWord myWord2RelatedWord(MyWord myWord,String word){\n        String[] words = myWord.getWords().split(\" \");\n        String[] highlightWords = new String[words.length];\n        for (int i = 0; i < words.length; i++) {\n            highlightWords[i] = words[i].trim().replaceAll(word,\"<span style='color: #BF3553'>\"+word+\"</span>\");\n        }\n        return RelatedWord.builder()\n                .id(myWord.getId())\n                .searchCount(myWord.getSearchCount())\n                .highlightWords(highlightWords)\n                .words(words).build();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/JavaBeanUtil.java b/src/main/java/top/lazyr/myweb/util/JavaBeanUtil.java
+--- a/src/main/java/top/lazyr/myweb/util/JavaBeanUtil.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/util/JavaBeanUtil.java	(date 1615512644443)
+@@ -1,6 +1,6 @@
+ package top.lazyr.myweb.util;
+ 
+-import top.lazyr.myweb.model.pojo.MyWord;
++import top.lazyr.myweb.model.po.MyWord;
+ import top.lazyr.myweb.model.vo.RelatedWord;
+ 
+ import java.util.ArrayList;
+Index: .idea/libraries/Maven__io_swagger_swagger_annotations_1_5_20.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/libraries/Maven__io_swagger_swagger_annotations_1_5_20.xml b/.idea/libraries/Maven__io_swagger_swagger_annotations_1_5_20.xml
+new file mode 100644
+--- /dev/null	(date 1616382143709)
++++ b/.idea/libraries/Maven__io_swagger_swagger_annotations_1_5_20.xml	(date 1616382143709)
+@@ -0,0 +1,13 @@
++<component name="libraryTable">
++  <library name="Maven: io.swagger:swagger-annotations:1.5.20">
++    <CLASSES>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-annotations/1.5.20/swagger-annotations-1.5.20.jar!/" />
++    </CLASSES>
++    <JAVADOC>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-annotations/1.5.20/swagger-annotations-1.5.20-javadoc.jar!/" />
++    </JAVADOC>
++    <SOURCES>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-annotations/1.5.20/swagger-annotations-1.5.20-sources.jar!/" />
++    </SOURCES>
++  </library>
++</component>
+\ No newline at end of file
+Index: src/main/java/top/lazyr/myweb/model/pojo/MyWord.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/model/pojo/MyWord.java b/src/main/java/top/lazyr/myweb/model/po/MyWord.java
+rename from src/main/java/top/lazyr/myweb/model/pojo/MyWord.java
+rename to src/main/java/top/lazyr/myweb/model/po/MyWord.java
+--- a/src/main/java/top/lazyr/myweb/model/pojo/MyWord.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/model/po/MyWord.java	(date 1615512644451)
+@@ -1,4 +1,4 @@
+-package top.lazyr.myweb.model.pojo;
++package top.lazyr.myweb.model.po;
+ 
+ import lombok.AllArgsConstructor;
+ import lombok.Builder;
+Index: src/main/java/top/lazyr/myweb/model/pojo/MyDictionary.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/model/pojo/MyDictionary.java b/src/main/java/top/lazyr/myweb/model/po/MyDictionary.java
+rename from src/main/java/top/lazyr/myweb/model/pojo/MyDictionary.java
+rename to src/main/java/top/lazyr/myweb/model/po/MyDictionary.java
+--- a/src/main/java/top/lazyr/myweb/model/pojo/MyDictionary.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/model/po/MyDictionary.java	(date 1615512644446)
+@@ -1,4 +1,4 @@
+-package top.lazyr.myweb.model.pojo;
++package top.lazyr.myweb.model.po;
+ 
+ 
+ import lombok.*;
+Index: src/main/java/top/lazyr/myweb/config/DataSourceConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/config/DataSourceConfig.java b/src/main/java/top/lazyr/myweb/config/DataSourceConfig.java
+new file mode 100644
+--- /dev/null	(date 1619520809143)
++++ b/src/main/java/top/lazyr/myweb/config/DataSourceConfig.java	(date 1619520809143)
+@@ -0,0 +1,55 @@
++package top.lazyr.myweb.config;
++
++import com.alibaba.druid.pool.DruidDataSource;
++import lombok.Getter;
++import lombok.Setter;
++import org.springframework.boot.SpringBootConfiguration;
++import org.springframework.boot.context.properties.ConfigurationProperties;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Primary;
++import org.springframework.transaction.annotation.EnableTransactionManagement;
++
++import javax.sql.DataSource;
++
++/**
++ * @author lazyr
++ * @created 2021/3/22
++ */
++
++//@Getter
++//@Setter
++//@SpringBootConfiguration
++//@EnableTransactionManagement
++//@ConfigurationProperties(prefix = "spring.datasource")
++public class DataSourceConfig {
++//    private String url;
++//    private String username;
++//    private String password;
++//    private String driverClassName;
++//    private int maxActive;
++//    private int maxIdle;
++//    private int minIdle;
++//    private int initialSize;
++//    private int maxWait;
++//
++//
++//
++//    @Primary
++//    @Bean("datasource.druid")
++//    public DataSource createDataSource() {
++//        DruidDataSource dataSource = new DruidDataSource();
++//        //base
++//        dataSource.setUrl(this.url);
++//        dataSource.setUsername(this.username);
++//        dataSource.setPassword(this.password);
++//        dataSource.setDriverClassName(this.driverClassName);
++//        //configuration
++//        dataSource.setMaxActive(this.maxActive);
++//        dataSource.setMinIdle(this.maxIdle);
++//        dataSource.setMinIdle(this.minIdle);
++//        dataSource.setInitialSize(this.initialSize);
++//        dataSource.setMaxWait(this.maxWait);
++//        return dataSource;
++//    }
++
++}
+Index: src/main/java/top/lazyr/myweb/util/Services.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/Services.java b/src/main/java/top/lazyr/myweb/util/Services.java
+new file mode 100644
+--- /dev/null	(date 1616383350861)
++++ b/src/main/java/top/lazyr/myweb/util/Services.java	(date 1616383350861)
+@@ -0,0 +1,53 @@
++package top.lazyr.myweb.util;
++
++import org.springframework.beans.BeansException;
++import org.springframework.context.ApplicationContext;
++import org.springframework.context.ApplicationContextAware;
++import org.springframework.context.annotation.Configuration;
++
++/**
++ * 用于查找已注册的Spring Bean，主要用于消除Spring基于代理实现的AOP this.method()调用不生效的缺陷；
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class Services {
++
++    private static ApplicationContext delegateContext;
++
++    static void setContext(ApplicationContext applicationContext) {
++        delegateContext = applicationContext;
++    }
++
++    /**
++     * 此方法只能查询到单个类型为{@code cls}的Bean，如果某个class有多个实现类被Spring托管，则会报错；
++     *
++     * @param cls Bean的类型
++     */
++    public static <T> T of(Class<T> cls) {
++        return delegateContext.getBean(cls);
++    }
++
++    /**
++     * 查找特定类型、特定名字的Spring Bean
++     *
++     * @param beanName Bean的名字
++     * @param cls      期望返回的类型
++     * @author 任贵杰
++     */
++    public static <T> T withName(String beanName, Class<T> cls) {
++        return delegateContext.getBean(beanName, cls);
++    }
++
++    /**
++     * 利用Spring提供的生命周期接口配置{@link Services#setContext(ApplicationContext)}
++     *
++     * @author 任贵杰
++     */
++    @Configuration
++    static class ServicesConfig implements ApplicationContextAware {
++        @Override
++        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
++            Services.setContext(applicationContext);
++        }
++    }
++}
+Index: .idea/libraries/Maven__io_swagger_swagger_models_1_5_20.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/libraries/Maven__io_swagger_swagger_models_1_5_20.xml b/.idea/libraries/Maven__io_swagger_swagger_models_1_5_20.xml
+new file mode 100644
+--- /dev/null	(date 1616382143711)
++++ b/.idea/libraries/Maven__io_swagger_swagger_models_1_5_20.xml	(date 1616382143711)
+@@ -0,0 +1,13 @@
++<component name="libraryTable">
++  <library name="Maven: io.swagger:swagger-models:1.5.20">
++    <CLASSES>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-models/1.5.20/swagger-models-1.5.20.jar!/" />
++    </CLASSES>
++    <JAVADOC>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-models/1.5.20/swagger-models-1.5.20-javadoc.jar!/" />
++    </JAVADOC>
++    <SOURCES>
++      <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-models/1.5.20/swagger-models-1.5.20-sources.jar!/" />
++    </SOURCES>
++  </library>
++</component>
+\ No newline at end of file
+Index: src/main/java/top/lazyr/myweb/config/HttpHeadersConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/config/HttpHeadersConfig.java b/src/main/java/top/lazyr/myweb/config/HttpHeadersConfig.java
+new file mode 100644
+--- /dev/null	(date 1616381752123)
++++ b/src/main/java/top/lazyr/myweb/config/HttpHeadersConfig.java	(date 1616381752123)
+@@ -0,0 +1,8 @@
++package top.lazyr.myweb.config;
++
++/**
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class HttpHeadersConfig {
++}
+Index: src/main/java/top/lazyr/myweb/config/JacksonConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/config/JacksonConfig.java b/src/main/java/top/lazyr/myweb/config/JacksonConfig.java
+new file mode 100644
+--- /dev/null	(date 1619520809149)
++++ b/src/main/java/top/lazyr/myweb/config/JacksonConfig.java	(date 1619520809149)
+@@ -0,0 +1,58 @@
++package top.lazyr.myweb.config;
++
++import com.fasterxml.jackson.databind.DeserializationFeature;
++import com.fasterxml.jackson.databind.ObjectMapper;
++import com.fasterxml.jackson.databind.SerializationFeature;
++import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
++import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
++import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
++import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
++import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
++import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
++import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
++import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++
++import java.time.LocalDate;
++import java.time.LocalDateTime;
++import java.time.LocalTime;
++import java.time.format.DateTimeFormatter;
++
++/**
++ * 设置Jackson中的时间格式
++ * @author lazyr
++ * @created 2021/3/22
++ */
++//@Configuration
++public class JacksonConfig {
++//    @Bean
++//    public ObjectMapper objectMapper(){
++//        ObjectMapper objectMapper = new ObjectMapper();
++//
++//        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
++//        objectMapper.disable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
++//        objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
++//
++//        JavaTimeModule javaTimeModule = new JavaTimeModule();
++//        javaTimeModule.addSerializer(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_DATE_TIME_FORMAT)));
++//        javaTimeModule.addSerializer(LocalDate.class,new LocalDateSerializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_DATE_FORMAT)));
++//        javaTimeModule.addSerializer(LocalTime.class,new LocalTimeSerializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_TIME_FORMAT)));
++//        javaTimeModule.addDeserializer(LocalDateTime.class,new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_DATE_TIME_FORMAT)));
++//        javaTimeModule.addDeserializer(LocalDate.class,new LocalDateDeserializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_DATE_FORMAT)));
++//        javaTimeModule.addDeserializer(LocalTime.class,new LocalTimeDeserializer(DateTimeFormatter.ofPattern(Constants.DEFAULT_TIME_FORMAT)));
++//        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule());
++//
++//        return objectMapper;
++//    }
++//
++//
++//    public interface Constants {
++//        /** 默认日期时间格式 */
++//        String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
++//        /** 默认日期格式 */
++//        String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
++//        /** 默认时间格式 */
++//        String DEFAULT_TIME_FORMAT = "HH:mm:ss";
++//    }
++}
+Index: src/main/java/top/lazyr/myweb/util/DESUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/util/DESUtil.java b/src/main/java/top/lazyr/myweb/util/DESUtil.java
+new file mode 100644
+--- /dev/null	(date 1616383350854)
++++ b/src/main/java/top/lazyr/myweb/util/DESUtil.java	(date 1616383350854)
+@@ -0,0 +1,91 @@
++package top.lazyr.myweb.util;
++
++import sun.misc.BASE64Decoder;
++import sun.misc.BASE64Encoder;
++
++import javax.crypto.Cipher;
++import javax.crypto.KeyGenerator;
++import java.security.Key;
++import java.security.SecureRandom;
++
++/**
++ * DES(Data Encryption Standard，数据加密标准)<br/>
++ * 用DES对称算法加密数据库连接的信息
++ * @author lazyr
++ * @created 2021/3/22
++ */
++public class DESUtil {
++    private static Key key;
++    // 设置密钥key
++    private static String KEY_STR = "nju-dop-sha-key@#$*^%";
++    private static String CHARSETNAME = "UTF-8";
++    private static String ALGORITHM = "DES";
++
++    static {
++        try {
++            // 生成des算法对象
++            KeyGenerator generator = KeyGenerator.getInstance(ALGORITHM);
++            // 运用SHA1安全策略
++            SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
++            // 设置密钥种子
++            secureRandom.setSeed(KEY_STR.getBytes());
++            // 初始化基于SHA1的算法对象
++            generator.init(secureRandom);
++            // 生成密钥对象
++            key = generator.generateKey();
++            generator = null;
++        } catch (Exception e) {
++            throw new RuntimeException();
++        }
++    }
++
++    /**
++     * 获取加密后的信息
++     *
++     * @param str
++     * @return
++     */
++    public static String getEncryptString(String str) {
++        // 基于BASE64编码，接收byte[]并转换层String
++        BASE64Encoder base64encoder = new BASE64Encoder();
++        try {
++            // utf-8编码
++            byte[] bytes = str.getBytes(CHARSETNAME);
++            // 获取加密对象
++            Cipher cipher = Cipher.getInstance(ALGORITHM);
++            // 初始化密码信息
++            cipher.init(Cipher.ENCRYPT_MODE, key);
++            // 加密
++            byte[] doFinal = cipher.doFinal(bytes);
++            // 返回
++            return base64encoder.encode(doFinal);
++        } catch (Exception e) {
++            throw new RuntimeException();
++        }
++    }
++
++    /**
++     * 获取解密之后的信息
++     *
++     * @param str
++     * @return
++     */
++    public static String getDecryptString(String str) {
++        //基于BASE64编码，接收byte[]并转换成String
++        BASE64Decoder base64decoder = new BASE64Decoder();
++        try {
++            //将字符串decode成byte[]
++            byte[] bytes = base64decoder.decodeBuffer(str);
++            //获取解密对象
++            Cipher cipher = Cipher.getInstance(ALGORITHM);
++            //初始化解密信息
++            cipher.init(Cipher.DECRYPT_MODE, key);
++            //解密
++            byte[] doFinal = cipher.doFinal(bytes);
++            //返回解密之后的信息
++            return new String(doFinal, CHARSETNAME);
++        } catch (Exception e) {
++            throw new RuntimeException(e);
++        }
++    }
++}
+Index: myweb.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule=\"true\" type=\"JAVA_MODULE\" version=\"4\">\n  <component name=\"FacetManager\">\n    <facet type=\"Spring\" name=\"Spring\">\n      <configuration />\n    </facet>\n    <facet type=\"web\" name=\"Web\">\n      <configuration>\n        <webroots />\n        <sourceRoots>\n          <root url=\"file://$MODULE_DIR$/src/main/java\" />\n          <root url=\"file://$MODULE_DIR$/src/main/resources\" />\n        </sourceRoots>\n      </configuration>\n    </facet>\n  </component>\n  <component name=\"NewModuleRootManager\" LANGUAGE_LEVEL=\"JDK_1_8\">\n    <output url=\"file://$MODULE_DIR$/target/classes\" />\n    <output-test url=\"file://$MODULE_DIR$/target/test-classes\" />\n    <content url=\"file://$MODULE_DIR$\">\n      <sourceFolder url=\"file://$MODULE_DIR$/src/main/java\" isTestSource=\"false\" />\n      <sourceFolder url=\"file://$MODULE_DIR$/src/main/resources\" type=\"java-resource\" />\n      <sourceFolder url=\"file://$MODULE_DIR$/src/test/java\" isTestSource=\"true\" />\n      <excludeFolder url=\"file://$MODULE_DIR$/target\" />\n    </content>\n    <orderEntry type=\"jdk\" jdkName=\"1.8\" jdkType=\"JavaSDK\" />\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-data-elasticsearch:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-logging:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: ch.qos.logback:logback-classic:1.2.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: ch.qos.logback:logback-core:1.2.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.logging.log4j:log4j-to-slf4j:2.13.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.logging.log4j:log4j-api:2.13.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.slf4j:jul-to-slf4j:1.7.30\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: jakarta.annotation:jakarta.annotation-api:1.3.5\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.yaml:snakeyaml:1.26\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.data:spring-data-elasticsearch:4.0.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-context:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-tx:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.data:spring-data-commons:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:transport-netty4-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-buffer:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-codec:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-codec-http:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-common:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-handler:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-resolver:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-transport:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.client:elasticsearch-rest-high-level-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch-core:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch-secure-sm:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch-x-content:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch-geo:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-core:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-analyzers-common:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-backward-codecs:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-grouping:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-highlighter:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-join:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-memory:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-misc:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-queries:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-queryparser:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-sandbox:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-spatial-extras:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-spatial3d:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.lucene:lucene-suggest:8.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:elasticsearch-cli:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: net.sf.jopt-simple:jopt-simple:5.0.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.carrotsearch:hppc:0.8.1\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: joda-time:joda-time:2.10.4\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.tdunning:t-digest:3.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.hdrhistogram:HdrHistogram:2.1.9\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch:jna:5.5.0\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.client:elasticsearch-rest-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.httpcomponents:httpclient:4.5.12\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.httpcomponents:httpcore:4.4.13\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.httpcomponents:httpasyncclient:4.1.4\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.httpcomponents:httpcore-nio:4.4.13\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: commons-codec:commons-codec:1.14\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:mapper-extras-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:parent-join-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:aggs-matrix-stats-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:rank-eval-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.elasticsearch.plugin:lang-mustache-client:7.9.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.github.spullara.mustache.java:compiler:0.9.6\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.slf4j:slf4j-api:1.7.30\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-core:2.11.0\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-databind:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.alibaba:fastjson:1.2.49\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.jsoup:jsoup:1.10.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"RUNTIME\" name=\"Maven: org.springframework.boot:spring-boot-devtools:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-autoconfigure:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.alibaba:druid:1.1.9\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-data-jpa:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-aop:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-aop:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.aspectj:aspectjweaver:1.9.6\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: jakarta.transaction:jakarta.transaction-api:1.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: jakarta.persistence:jakarta.persistence-api:2.2.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.hibernate:hibernate-core:5.4.21.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.jboss.logging:jboss-logging:3.4.1.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.javassist:javassist:3.24.0-GA\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: net.bytebuddy:byte-buddy:1.10.14\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: antlr:antlr:2.7.7\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.jboss:jandex:2.1.3.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml:classmate:1.5.1\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.dom4j:dom4j:2.1.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.hibernate.common:hibernate-commons-annotations:5.1.0.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.glassfish.jaxb:jaxb-runtime:2.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.glassfish.jaxb:txw2:2.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.sun.istack:istack-commons-runtime:3.0.11\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"RUNTIME\" name=\"Maven: com.sun.activation:jakarta.activation:1.2.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.data:spring-data-jpa:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-orm:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-beans:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-aspects:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-jdbc:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.zaxxer:HikariCP:3.4.5\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-jdbc:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: mysql:mysql-connector-java:8.0.21\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-web:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-json:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-tomcat:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.tomcat.embed:tomcat-embed-core:9.0.38\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.glassfish:jakarta.el:3.0.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.38\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-web:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-webmvc:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-expression:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.projectlombok:lombok:1.18.12\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.springframework.boot:spring-boot-starter-test:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.springframework.boot:spring-boot-test:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.springframework.boot:spring-boot-test-autoconfigure:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: com.jayway.jsonpath:json-path:2.4.0\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: net.minidev:json-smart:2.3\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: net.minidev:accessors-smart:1.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.ow2.asm:asm:5.0.4\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: jakarta.activation:jakarta.activation-api:1.2.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.assertj:assertj-core:3.16.1\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.hamcrest:hamcrest:2.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.jupiter:junit-jupiter:5.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.jupiter:junit-jupiter-api:5.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.apiguardian:apiguardian-api:1.1.0\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.opentest4j:opentest4j:1.2.0\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.platform:junit-platform-commons:1.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.jupiter:junit-jupiter-params:5.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.jupiter:junit-jupiter-engine:5.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.junit.platform:junit-platform-engine:1.6.2\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.mockito:mockito-core:3.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: net.bytebuddy:byte-buddy-agent:1.10.14\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.objenesis:objenesis:2.6\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.mockito:mockito-junit-jupiter:3.3.3\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.skyscreamer:jsonassert:1.5.0\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-core:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-jcl:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.springframework:spring-test:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.xmlunit:xmlunit-core:2.7.0\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: junit:junit:4.13\" level=\"project\" />\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.hamcrest:hamcrest-core:2.2\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: com.clsaa.rest.result:standard-result:0.0.1\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-webflux:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-reactor-netty:2.3.4.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.projectreactor.netty:reactor-netty:0.9.12.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-codec-http2:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-handler-proxy:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-codec-socks:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.netty:netty-transport-native-unix-common:4.1.52.Final\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-webflux:5.2.9.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: io.projectreactor:reactor-core:3.3.10.RELEASE\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.reactivestreams:reactive-streams:1.0.3\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.synchronoss.cloud:nio-multipart-parser:1.1.0\" level=\"project\" />\n    <orderEntry type=\"library\" name=\"Maven: org.synchronoss.cloud:nio-stream-storage:1.1.3\" level=\"project\" />\n  </component>\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/myweb.iml b/myweb.iml
+--- a/myweb.iml	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/myweb.iml	(date 1620972613793)
+@@ -13,6 +13,16 @@
+         </sourceRoots>
+       </configuration>
+     </facet>
++    <facet type="jpa" name="JPA">
++      <configuration>
++        <setting name="validation-enabled" value="true" />
++        <setting name="provider-name" value="Hibernate" />
++        <datasource-mapping>
++          <factory-entry name="entityManagerFactory" />
++        </datasource-mapping>
++        <naming-strategy-map />
++      </configuration>
++    </facet>
+   </component>
+   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+     <output url="file://$MODULE_DIR$/target/classes" />
+@@ -89,7 +99,6 @@
+     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:rank-eval-client:7.9.2" level="project" />
+     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:lang-mustache-client:7.9.2" level="project" />
+     <orderEntry type="library" name="Maven: com.github.spullara.mustache.java:compiler:0.9.6" level="project" />
+-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
+     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.0" level="project" />
+     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.2" level="project" />
+     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.2" level="project" />
+@@ -111,7 +120,6 @@
+     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.10.14" level="project" />
+     <orderEntry type="library" name="Maven: antlr:antlr:2.7.7" level="project" />
+     <orderEntry type="library" name="Maven: org.jboss:jandex:2.1.3.Final" level="project" />
+-    <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.5.1" level="project" />
+     <orderEntry type="library" name="Maven: org.dom4j:dom4j:2.1.3" level="project" />
+     <orderEntry type="library" name="Maven: org.hibernate.common:hibernate-commons-annotations:5.1.0.Final" level="project" />
+     <orderEntry type="library" name="Maven: org.glassfish.jaxb:jaxb-runtime:2.3.3" level="project" />
+@@ -184,5 +192,20 @@
+     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.3" level="project" />
+     <orderEntry type="library" name="Maven: org.synchronoss.cloud:nio-multipart-parser:1.1.0" level="project" />
+     <orderEntry type="library" name="Maven: org.synchronoss.cloud:nio-stream-storage:1.1.3" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-swagger2:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: io.swagger:swagger-annotations:1.5.20" level="project" />
++    <orderEntry type="library" name="Maven: io.swagger:swagger-models:1.5.20" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-spi:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-core:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-schema:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-swagger-common:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-spring-web:2.9.2" level="project" />
++    <orderEntry type="library" name="Maven: com.google.guava:guava:20.0" level="project" />
++    <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.5.1" level="project" />
++    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
++    <orderEntry type="library" name="Maven: org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE" level="project" />
++    <orderEntry type="library" name="Maven: org.springframework.plugin:spring-plugin-metadata:1.2.0.RELEASE" level="project" />
++    <orderEntry type="library" name="Maven: org.mapstruct:mapstruct:1.2.0.Final" level="project" />
++    <orderEntry type="library" name="Maven: io.springfox:springfox-swagger-ui:2.9.2" level="project" />
+   </component>
+ </module>
+\ No newline at end of file
+Index: src/main/java/top/lazyr/myweb/service/WordService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb.service;\n\nimport com.clsaa.rest.result.Pagination;\nimport top.lazyr.myweb.model.pojo.MyWord;\nimport top.lazyr.myweb.model.vo.RelatedWord;\n\nimport java.util.List;\n\npublic interface WordService {\n\n    MyWord getOneById(long id);\n    int getSearchCountById(long id);\n    String getWordsById(long id);\n\n    MyWord getOneByWords(String word);\n//    List<MyWord> getAllByWord(String word);\n    Pagination<RelatedWord> getAllByWord(Integer pageNo, Integer pageSize,String word);\n\n    int updateSearchCountById(long id);\n\n    int insertOne(String words);\n    int insertOne(MyWord myWord);\n    int insertAll(List<MyWord> myWords);\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/service/WordService.java b/src/main/java/top/lazyr/myweb/service/WordService.java
+--- a/src/main/java/top/lazyr/myweb/service/WordService.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/service/WordService.java	(date 1619074981073)
+@@ -1,24 +1,80 @@
+ package top.lazyr.myweb.service;
+ 
+ import com.clsaa.rest.result.Pagination;
+-import top.lazyr.myweb.model.pojo.MyWord;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.PageRequest;
++import org.springframework.data.domain.Pageable;
++import org.springframework.data.domain.Sort;
++import org.springframework.data.jpa.domain.Specification;
++import org.springframework.stereotype.Service;
++import top.lazyr.myweb.repository.WordDao;
++import top.lazyr.myweb.model.po.MyWord;
+ import top.lazyr.myweb.model.vo.RelatedWord;
++import top.lazyr.myweb.util.JavaBeanUtil;
+ 
++import javax.persistence.criteria.*;
+ import java.util.List;
+ 
+-public interface WordService {
++@Service
++public class WordService {
++    @Autowired
++    private WordDao dao;
++
++    public MyWord getOneById(long id) {
++        return dao.getOne(id);
++    }
++
++    public int getSearchCountById(long id) {
++        MyWord myWord = dao.getOne(id);
++        return myWord == null?null:myWord.getSearchCount();
++    }
++
++    public String getWordsById(long id) {
++        MyWord myWord = dao.getOne(id);
++        return myWord == null?null:myWord.getWords();
++    }
+ 
+-    MyWord getOneById(long id);
+-    int getSearchCountById(long id);
+-    String getWordsById(long id);
++    public MyWord getOneByWords(String word) {
++        return dao.getOneByWords(word);
++    }
+ 
+-    MyWord getOneByWords(String word);
+-//    List<MyWord> getAllByWord(String word);
+-    Pagination<RelatedWord> getAllByWord(Integer pageNo, Integer pageSize,String word);
++    public Pagination<RelatedWord> getAllByWord(Integer pageNo, Integer pageSize,String word) {
++        Specification<MyWord> specification = new Specification<MyWord>() {
+ 
+-    int updateSearchCountById(long id);
++            @Override
++            public Predicate toPredicate(Root<MyWord> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
++                Path words = root.get("words");
++                Predicate predicate = criteriaBuilder.like(words, "%" + word + "%");
++                return predicate;
++            }
++        };
+ 
+-    int insertOne(String words);
+-    int insertOne(MyWord myWord);
+-    int insertAll(List<MyWord> myWords);
++        Sort sort = Sort.by(Sort.Direction.DESC, "searchCount");
++        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
++        Page<MyWord> allWords = dao.findAll(specification, pageable);
++        List<RelatedWord> relatedWords = JavaBeanUtil.myWords2RelatedWords(allWords.getContent(),word);
++        Pagination<RelatedWord> pagination = new Pagination<>();
++        pagination.setPageNo(pageNo);
++        pagination.setPageSize(pageSize);
++        pagination.setPageList(relatedWords);
++        pagination.setTotalCount(dao.getAllByWords("%"+word+"%").size());
++        return pagination;
++    }
++
++    public int updateSearchCountById(long id) {
++        return dao.updateSearchCountById(id);
++    }
++
++    public int insertOne(String words) {
++        return insertOne(MyWord.builder().words(words).build());
++    }
++
++    public int insertOne(MyWord myWord) {
++        return dao.save(myWord) == null?null:1;
++    }
++
++    public int insertAll(List<MyWord> myWords) {
++        return dao.saveAll(myWords)==null?null:myWords.size();
++    }
+ }
+Index: src/main/resources/banner.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/banner.txt b/src/main/resources/banner.txt
+new file mode 100644
+--- /dev/null	(date 1616558024489)
++++ b/src/main/resources/banner.txt	(date 1616558024489)
+@@ -0,0 +1,6 @@
++   _       ___     ____  __   __   ___   
++  | |     /   \   |_  /  \ \ / /  | _ \  
++  | |__   | - |    / /    \ V /   |   /  
++  |____|  |_|_|   /___|   _|_|_   |_|_\  
++_|"""""|_|"""""|_|"""""|_| """ |_|"""""| 
++"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
+Index: src/main/java/top/lazyr/myweb/MywebApplication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package top.lazyr.myweb;\n\nimport org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n\n@SpringBootApplication\npublic class MywebApplication {\n\n    public static void main(String[] args) {\n        SpringApplication.run(MywebApplication.class, args);\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/top/lazyr/myweb/MywebApplication.java b/src/main/java/top/lazyr/myweb/MywebApplication.java
+--- a/src/main/java/top/lazyr/myweb/MywebApplication.java	(revision d121b2d349e707b18db99a83a6b7139d0f86fc90)
++++ b/src/main/java/top/lazyr/myweb/MywebApplication.java	(date 1619520339878)
+@@ -2,6 +2,8 @@
+ 
+ import org.springframework.boot.SpringApplication;
+ import org.springframework.boot.autoconfigure.SpringBootApplication;
++import org.springframework.context.annotation.ComponentScan;
++import springfox.documentation.swagger2.annotations.EnableSwagger2;
+ 
+ @SpringBootApplication
+ public class MywebApplication {

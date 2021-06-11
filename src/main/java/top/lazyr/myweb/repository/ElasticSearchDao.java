@@ -1,4 +1,4 @@
-package top.lazyr.myweb.dao;
+package top.lazyr.myweb.repository;
 
 public interface ElasticSearchDao {
 }

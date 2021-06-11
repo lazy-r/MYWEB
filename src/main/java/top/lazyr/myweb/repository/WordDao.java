@@ -1,10 +1,10 @@
-package top.lazyr.myweb.dao;
+package top.lazyr.myweb.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import top.lazyr.myweb.model.pojo.MyWord;
+import top.lazyr.myweb.model.po.MyWord;
 
 import javax.transaction.Transactional;
 import java.util.List;

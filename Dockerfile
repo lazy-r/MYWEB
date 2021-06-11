@@ -5,4 +5,4 @@ CMD ["--server.port=8040"]
 
 EXPOSE 8040
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+CMD exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=prod -jar /app.jar

@@ -1,4 +1,4 @@
-package top.lazyr.myweb.model.pojo;
+package top.lazyr.myweb.model.po;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

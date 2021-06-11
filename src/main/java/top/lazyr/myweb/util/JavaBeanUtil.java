@@ -1,6 +1,6 @@
 package top.lazyr.myweb.util;
 
-import top.lazyr.myweb.model.pojo.MyWord;
+import top.lazyr.myweb.model.po.MyWord;
 import top.lazyr.myweb.model.vo.RelatedWord;
 
 import java.util.ArrayList;
