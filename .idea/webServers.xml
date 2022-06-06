@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="bd98c481-e53f-437d-a960-87402310c879" name="aliyun" url="http://121.196.211.138">
+        <fileTransfer rootFolder="/root/projects/lazy_web_backend" accessType="SFTP" host="121.196.211.138" port="22" sshConfigId="aa14a1f3-0517-4089-aef7-1f7094bca4df" sshConfig="root@121.196.211.138:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
